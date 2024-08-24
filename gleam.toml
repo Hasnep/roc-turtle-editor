@@ -1,0 +1,17 @@
+name = "roc_turtle_editor"
+version = "0.0.1"
+target = "erlang"
+
+[dependencies]
+filepath = ">= 1.0.0 and < 2.0.0"
+gleam_erlang = ">= 0.27.0 and < 0.28.0"
+gleam_http = ">= 3.7.0 and < 4.0.0"
+gleam_stdlib = ">= 0.38.0 and < 0.39.0" # v0.40.0 removes unsafe_coerce, v0.39.0 seems like it has a bug with base64 decode
+mist = ">= 1.0.0 and < 2.0.0"
+shellout = ">= 1.6.0 and < 2.0.0"
+simplifile = ">= 2.1.0 and < 3.0.0"
+temporary = ">= 1.0.0 and < 2.0.0"
+wisp = ">= 1.1.0 and < 1.2.0"
+
+[dev-dependencies]
+gleeunit = ">= 1.0.0 and < 2.0.0"

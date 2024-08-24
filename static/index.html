@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      header {
+        flex-grow: 0; /* Don't grow the header, keep it at its content size */
+      }
+
+      .columns {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        flex-grow: 1; /* Allow the columns to grow and fill the remaining height */
+        gap: 2rem; /* Add gap between columns */
+      }
+
+      .column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        max-width: 50%; /* Limit the width of the columns */
+      }
+
+      .column textarea#code {
+        width: 100%;
+        height: 100%; /* Set the height of the textarea to 100% of the column */
+        font-family: monospace;
+        font-size: 14px;
+        border: 2px solid #ccc;
+        resize: none;
+      }
+
+      #drawing {
+        width: 500px;
+        height: 500px;
+        border: 2px solid #ccc;
+      }
+    </style>
+    <script>
+      const debounce = (callback, delay) => {
+        let timer;
+        return () => {
+          clearTimeout(timer);
+          timer = setTimeout(callback, delay);
+        };
+      };
+
+      const handleInput = debounce(() => {
+        const codeInputElement = document.getElementById("code");
+        const drawingElement = document.getElementById("drawing");
+
+        // // Clear the drawing area and show a loading message
+        // drawingElement.innerHTML = "Loading...";
+        // Get the code from the textarea and send it to the server
+        const code = codeInputElement.value;
+        fetch("/draw", {
+          method: "POST",
+          body: code,
+        })
+          .then((response) => response.text())
+          .then((svg) => {
+            drawingElement.innerHTML = svg;
+          });
+      }, 500);
+
+      handleInput();
+    </script>
+    <title>Roc Turtle Editor</title>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Centred at the top -->
+      <header>
+        <h1>Roc Turtle Editor</h1>
+        <p>
+          A very simple online editor for
+          <a href="https://github.com/hasnep/roc-turtle">roc-turtle</a>. Write
+          code on the left and see a preview on the right. The canvas size is
+          500x500 with the origin in the centre. For more information, check out
+          the
+          <a href="https://hasnep.github.io/roc-turtle">documentation</a> for
+          the roc-turtle module. The source code for this editor is available on
+          <a href="https://github.com/hasnep/roc-turtle-editor">GitHub</a>.
+        </p>
+      </header>
+      <!-- Split into two columns -->
+      <div class="columns">
+        <!-- First column -->
+        <div class="column">
+          <p>Code:</p>
+          <textarea id="code" oninput="handleInput()">
+module [main]
+
+import turtle.Turtle
+
+initialLength = 100
+initialAngle = Num.pi / 6
+
+main = \{} ->
+    Turtle.new {}
+    |> Turtle.setPen Up
+    |> Turtle.moveTo { x: 0, y: 250 }
+    |> Turtle.turnTo (-Num.pi / 2)
+    |> Turtle.setPen Down
+    |> drawBranch initialLength initialAngle
+
+drawBranch = \t, length, angle ->
+    if length < 3 then
+        t
+    else
+        t2 =
+          t
+          |> Turtle.setPen Down
+          |> Turtle.forward length
+          |> Turtle.setPen Up
+        p = Turtle.getPosition t2
+        d = Turtle.getDirection t2
+        t3 =
+            t2
+            |> Turtle.turn angle
+            |> drawBranch (length * 0.75) angle
+            |> Turtle.moveTo p
+            |> Turtle.turnTo d
+        t4 =
+            t3
+            |> Turtle.turn -angle
+            |> drawBranch (length * 0.75) angle
+            |> Turtle.moveTo p
+            |> Turtle.turnTo d
+        t4
+      </textarea
+          >
+        </div>
+        <!-- Second column -->
+        <div class="column">
+          <p>Preview:</p>
+          <div id="drawing"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
